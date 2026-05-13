@@ -12,14 +12,6 @@ services:
     volumes:
       - ./data:/app/data
 
-  # Cloudflare Tunnel - cria túnel seguro do Mac Mini pro Cloudflare,
-  # sem precisar abrir portas no router. Veja README pra obter o token.
-  tunnel:
-    image: cloudflare/cloudflared:latest
-    container_name: orlando-2027-tunnel
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run
-    environment:
-      TUNNEL_TOKEN: "${CLOUDFLARE_TUNNEL_TOKEN}"
-    depends_on:
-      - app
+# Cloudflare Tunnel não está aqui porque você já tem um tunnel
+# rodando no host (mac-mini-home) que cuida do orlando.pessanhaserver.com.br
+# apontando pra http://192.168.3.253:3000
