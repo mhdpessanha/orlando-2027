@@ -21,17 +21,27 @@ ENV HOSTNAME="0.0.0.0"
 
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 
+# Next.js standalone output
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 
-# data dir for sqlite
+# Prisma schema, seed, scripts e package.json (precisamos pra init)
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+
+# node_modules completo: traz tsx e prisma CLI pro init + create-user
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+
+# Script de inicialização
+COPY --chown=nextjs:nodejs docker-init.sh ./docker-init.sh
+RUN chmod +x ./docker-init.sh
+
+# Diretório de dados (volume) com ownership correto
 RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
 VOLUME /app/data
 
 USER nextjs
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["./docker-init.sh"]
