@@ -1,0 +1,43 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --park-bg: #FAFAF7;
+}
+
+html {
+  background: var(--park-bg);
+}
+
+body {
+  font-family: "Geist", system-ui, sans-serif;
+  color: #2C2C2A;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: "Fraunces", Georgia, serif;
+  font-optical-sizing: auto;
+  letter-spacing: -0.02em;
+}
+
+/* sparkle background dots */
+.sparkle::before,
+.sparkle::after {
+  content: "✦";
+  position: absolute;
+  color: currentColor;
+  opacity: 0.4;
+  pointer-events: none;
+}
+.sparkle::before { top: 12px; right: 16px; font-size: 14px; }
+.sparkle::after { bottom: 16px; left: 20px; font-size: 10px; }
+
+/* number countdown big */
+.countdown-num {
+  font-feature-settings: "tnum";
+  letter-spacing: -0.04em;
+}

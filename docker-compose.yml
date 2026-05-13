@@ -1,0 +1,25 @@
+services:
+  app:
+    build: .
+    container_name: orlando-2027
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: "file:/app/data/orlando.db"
+      SESSION_SECRET: "${SESSION_SECRET}"
+      NODE_ENV: production
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - ./data:/app/data
+
+  # Cloudflare Tunnel - cria túnel seguro do Mac Mini pro Cloudflare,
+  # sem precisar abrir portas no router. Veja README pra obter o token.
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: orlando-2027-tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: "${CLOUDFLARE_TUNNEL_TOKEN}"
+    depends_on:
+      - app

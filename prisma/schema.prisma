@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  name         String
+  passwordHash String
+  color        String    @default("ink")
+  role         String    @default("member")
+  createdAt    DateTime  @default(now())
+  sessions     Session[]
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Trip {
+  id          Int      @id @default(1)
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+}
+
+model Accommodation {
+  id           String   @id @default(cuid())
+  name         String
+  shortName    String
+  checkIn      DateTime
+  checkOut     DateTime
+  address      String?
+  confirmation String?
+  notes        String?
+  type         String
+  days         Day[]
+}
+
+model Flight {
+  id           String   @id @default(cuid())
+  direction    String
+  segment      Int
+  airline      String
+  flightNumber String
+  fromAirport  String
+  toAirport    String
+  departure    DateTime
+  arrival      DateTime
+  confirmation String?
+  seats        String?
+  notes        String?
+}
+
+model Day {
+  id              String        @id @default(cuid())
+  date            DateTime      @unique
+  parkCode        String?
+  accommodationId String?
+  accommodation   Accommodation? @relation(fields: [accommodationId], references: [id])
+  earlyEntry      Boolean       @default(false)
+  extendedEvening Boolean       @default(false)
+  parkOpen        String?
+  parkClose       String?
+  notes           String?
+  reservations    Reservation[]
+  tips            Tip[]
+}
+
+model Reservation {
+  id           String   @id @default(cuid())
+  type         String
+  name         String
+  date         DateTime
+  time         String?
+  partySize    Int?
+  location     String?
+  confirmation String?
+  cost         Float?
+  notes        String?
+  link         String?
+  dayId        String?
+  day          Day?     @relation(fields: [dayId], references: [id], onDelete: SetNull)
+  createdAt    DateTime @default(now())
+  createdBy    String?
+}
+
+model Tip {
+  id        String  @id @default(cuid())
+  dayId     String
+  day       Day     @relation(fields: [dayId], references: [id], onDelete: Cascade)
+  category  String
+  title     String
+  notes     String?
+  priority  Int     @default(0)
+  done      Boolean @default(false)
+}
+
+model Event {
+  id              String   @id @default(cuid())
+  title           String
+  date            DateTime
+  category        String
+  description     String?
+  status          String   @default("pending")
+  alertDaysBefore Int      @default(7)
+  link            String?
+}
