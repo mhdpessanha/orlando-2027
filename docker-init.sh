@@ -1,20 +1,17 @@
 #!/bin/sh
 set -e
 
-DB_FILE="/app/data/orlando.db"
-NEEDS_SEED=false
-
-if [ ! -f "$DB_FILE" ]; then
-  echo "📦 Primeira inicialização detectada — banco não existe ainda"
-  NEEDS_SEED=true
-fi
-
+# Aplica schema (idempotente, seguro rodar sempre)
 echo "🔧 Aplicando schema Prisma..."
 npx prisma db push --skip-generate --accept-data-loss
 
-if [ "$NEEDS_SEED" = "true" ]; then
-  echo "🌱 Rodando seed (usuários, hospedagens, voos, roteiro)..."
+# Roda seed apenas se não houver usuários no banco
+# (mais robusto que checar arquivo .db, que pode existir vazio/parcial)
+if npx tsx scripts/needs-seed.ts; then
+  echo "🌱 Banco vazio, rodando seed (usuários, voos, hospedagens, roteiro, dicas)..."
   npx tsx prisma/seed.ts
+else
+  echo "📦 Banco já populado, pulando seed"
 fi
 
 echo "🚀 Subindo servidor Next na porta $PORT..."

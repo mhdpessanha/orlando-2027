@@ -1,6 +1,13 @@
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 import { verifyCredentials, createSession, COOKIE_NAME } from "@/lib/auth";
+
+// Constrói URL absoluta a partir do Host header (não do req.url, que no standalone
+// usa o hostname de bind do servidor — pode ser 0.0.0.0, que o Safari recusa)
+function buildUrl(req: Request, path: string): URL {
+  const host = req.headers.get("host") || "localhost:3000";
+  const proto = req.headers.get("x-forwarded-proto") || "http";
+  return new URL(path, `${proto}://${host}`);
+}
 
 export async function POST(req: Request) {
   const form = await req.formData();
@@ -10,22 +17,21 @@ export async function POST(req: Request) {
 
   const user = await verifyCredentials(username, password);
   if (!user) {
-    const params = new URLSearchParams();
-    params.set("error", "1");
-    if (from && from !== "/") params.set("from", from);
-    redirect(`/login?${params.toString()}`);
+    const url = buildUrl(req, "/login");
+    url.searchParams.set("error", "1");
+    if (from && from !== "/") url.searchParams.set("from", from);
+    return NextResponse.redirect(url, { status: 303 });
   }
 
   const { token, expiresAt } = await createSession(user.id);
 
-  const cookieStore = await cookies();
-  cookieStore.set(COOKIE_NAME, token, {
+  const response = NextResponse.redirect(buildUrl(req, from || "/"), { status: 303 });
+  response.cookies.set(COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     expires: expiresAt,
     path: "/",
   });
-
-  redirect(from || "/");
+  return response;
 }
