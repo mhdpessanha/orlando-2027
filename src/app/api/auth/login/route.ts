@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { verifyCredentials, createSession, COOKIE_NAME } from "@/lib/auth";
 
 export async function POST(req: Request) {
@@ -9,21 +10,22 @@ export async function POST(req: Request) {
 
   const user = await verifyCredentials(username, password);
   if (!user) {
-    const url = new URL("/login", req.url);
-    url.searchParams.set("error", "1");
-    if (from && from !== "/") url.searchParams.set("from", from);
-    return NextResponse.redirect(url, { status: 303 });
+    const params = new URLSearchParams();
+    params.set("error", "1");
+    if (from && from !== "/") params.set("from", from);
+    redirect(`/login?${params.toString()}`);
   }
 
   const { token, expiresAt } = await createSession(user.id);
 
-  const response = NextResponse.redirect(new URL(from || "/", req.url), { status: 303 });
-  response.cookies.set(COOKIE_NAME, token, {
+  const cookieStore = await cookies();
+  cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     expires: expiresAt,
     path: "/",
   });
-  return response;
+
+  redirect(from || "/");
 }

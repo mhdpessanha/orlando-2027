@@ -1,14 +1,13 @@
-import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { destroySession, COOKIE_NAME } from "@/lib/auth";
 
-export async function POST(req: Request) {
+export async function POST() {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
   if (token) await destroySession(token);
 
-  const response = NextResponse.redirect(new URL("/login", req.url), { status: 303 });
-  response.cookies.set(COOKIE_NAME, "", {
+  cookieStore.set(COOKIE_NAME, "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
@@ -16,5 +15,6 @@ export async function POST(req: Request) {
     maxAge: 0,
     path: "/",
   });
-  return response;
+
+  redirect("/login");
 }
