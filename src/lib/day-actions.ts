@@ -15,11 +15,14 @@ const DaySchema = z.object({
   notes: z.string().optional(),
 });
 
-export async function updateDay(id: string, formData: FormData) {
+export async function updateDay(id: string, formData: FormData): Promise<void> {
   await requireUser();
   const raw = Object.fromEntries(formData.entries());
   const parsed = DaySchema.safeParse(raw);
-  if (!parsed.success) return { ok: false as const, error: "Dados inválidos" };
+  if (!parsed.success) {
+    console.error("updateDay validation failed:", parsed.error.errors);
+    return;
+  }
 
   const d = parsed.data;
   await prisma.day.update({
@@ -52,11 +55,14 @@ const TipSchema = z.object({
   priority: z.coerce.number().int().min(0).max(3).optional(),
 });
 
-export async function createTip(formData: FormData) {
+export async function createTip(formData: FormData): Promise<void> {
   await requireUser();
   const raw = Object.fromEntries(formData.entries());
   const parsed = TipSchema.safeParse(raw);
-  if (!parsed.success) return { ok: false as const, error: "Dados inválidos" };
+  if (!parsed.success) {
+    console.error("createTip validation failed:", parsed.error.errors);
+    return;
+  }
 
   const t = parsed.data;
   await prisma.tip.create({

@@ -21,13 +21,14 @@ const ReservationSchema = z.object({
   dayId: z.string().optional(),
 });
 
-export async function createReservation(formData: FormData) {
+export async function createReservation(formData: FormData): Promise<void> {
   const user = await requireUser();
 
   const raw = Object.fromEntries(formData.entries());
   const parsed = ReservationSchema.safeParse(raw);
   if (!parsed.success) {
-    return { ok: false as const, error: parsed.error.errors[0]?.message ?? "Dados inválidos" };
+    console.error("createReservation validation failed:", parsed.error.errors);
+    return;
   }
 
   const d = parsed.data;
@@ -62,13 +63,14 @@ export async function createReservation(formData: FormData) {
   redirect("/reservas");
 }
 
-export async function updateReservation(id: string, formData: FormData) {
+export async function updateReservation(id: string, formData: FormData): Promise<void> {
   await requireUser();
 
   const raw = Object.fromEntries(formData.entries());
   const parsed = ReservationSchema.safeParse(raw);
   if (!parsed.success) {
-    return { ok: false as const, error: parsed.error.errors[0]?.message ?? "Dados inválidos" };
+    console.error("updateReservation validation failed:", parsed.error.errors);
+    return;
   }
 
   const d = parsed.data;

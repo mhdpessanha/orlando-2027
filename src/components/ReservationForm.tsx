@@ -10,7 +10,7 @@ export default function ReservationForm({
   days,
   submitLabel = "salvar",
 }: {
-  action: (formData: FormData) => void;
+  action: (formData: FormData) => void | Promise<void>;
   defaults?: Partial<{
     type: string;
     name: string;
