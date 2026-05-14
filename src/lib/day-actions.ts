@@ -5,6 +5,10 @@ import { z } from "zod";
 import { prisma } from "./prisma";
 import { requireUser } from "./auth";
 
+function formatZodError(err: z.ZodError): string {
+  return err.issues.map((i) => `${i.path.join(".") || "campo"}: ${i.message}`).join("; ");
+}
+
 const DaySchema = z.object({
   parkCode: z.string().optional().or(z.literal("")),
   accommodationId: z.string().optional().or(z.literal("")),
@@ -20,8 +24,7 @@ export async function updateDay(id: string, formData: FormData): Promise<void> {
   const raw = Object.fromEntries(formData.entries());
   const parsed = DaySchema.safeParse(raw);
   if (!parsed.success) {
-    console.error("updateDay validation failed:", parsed.error.errors);
-    return;
+    throw new Error(`Dados inválidos ao salvar dia — ${formatZodError(parsed.error)}`);
   }
 
   const d = parsed.data;
@@ -60,8 +63,7 @@ export async function createTip(formData: FormData): Promise<void> {
   const raw = Object.fromEntries(formData.entries());
   const parsed = TipSchema.safeParse(raw);
   if (!parsed.success) {
-    console.error("createTip validation failed:", parsed.error.errors);
-    return;
+    throw new Error(`Dados inválidos ao criar dica — ${formatZodError(parsed.error)}`);
   }
 
   const t = parsed.data;

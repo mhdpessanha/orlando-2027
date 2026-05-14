@@ -27,9 +27,8 @@ Site privado da viagem de janeiro de 2027 pra Orlando. Hospedado em casa, expost
 # 1. instalar dependências
 npm install
 
-# 2. criar .env (copia o exemplo e edita)
+# 2. criar .env (copia o exemplo)
 cp .env.example .env
-# edita SESSION_SECRET — usa: openssl rand -hex 32
 
 # 3. inicializar o banco
 npm run db:push
@@ -80,11 +79,8 @@ No Mac Mini (com Docker Desktop ou OrbStack rodando):
 git clone git@github.com:murilo/orlando-2027.git
 cd orlando-2027
 
-# cria o .env de produção
-cat > .env <<EOF
-SESSION_SECRET=$(openssl rand -hex 32)
-CLOUDFLARE_TUNNEL_TOKEN=cole-aqui-o-token-do-tunnel
-EOF
+# cria o .env de produção (vazio é OK — o compose já tem o que precisa)
+touch .env
 
 # build + up
 docker compose up -d --build

@@ -12,6 +12,7 @@ export async function verifyCredentials(username: string, password: string) {
     where: { username: username.toLowerCase().trim() },
   });
   if (!user) return null;
+  if (!user.passwordHash) return null;
   const ok = await bcrypt.compare(password, user.passwordHash);
   if (!ok) return null;
   return user;
@@ -50,4 +51,10 @@ export async function requireUser() {
 
 export async function hashPassword(password: string) {
   return bcrypt.hash(password, 10);
+}
+
+export function safeRedirectPath(input: string | undefined | null): string {
+  const v = (input ?? "").trim();
+  if (!v.startsWith("/") || v.startsWith("//") || v.startsWith("/\\")) return "/";
+  return v;
 }

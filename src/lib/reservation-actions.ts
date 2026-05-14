@@ -7,6 +7,10 @@ import { prisma } from "./prisma";
 import { requireUser } from "./auth";
 import { parseUTCDate } from "./dates";
 
+function formatZodError(err: z.ZodError): string {
+  return err.issues.map((i) => `${i.path.join(".") || "campo"}: ${i.message}`).join("; ");
+}
+
 const ReservationSchema = z.object({
   type: z.string().min(1),
   name: z.string().min(1, "Nome obrigatório"),
@@ -27,8 +31,7 @@ export async function createReservation(formData: FormData): Promise<void> {
   const raw = Object.fromEntries(formData.entries());
   const parsed = ReservationSchema.safeParse(raw);
   if (!parsed.success) {
-    console.error("createReservation validation failed:", parsed.error.errors);
-    return;
+    throw new Error(`Dados inválidos ao criar reserva — ${formatZodError(parsed.error)}`);
   }
 
   const d = parsed.data;
@@ -69,8 +72,7 @@ export async function updateReservation(id: string, formData: FormData): Promise
   const raw = Object.fromEntries(formData.entries());
   const parsed = ReservationSchema.safeParse(raw);
   if (!parsed.success) {
-    console.error("updateReservation validation failed:", parsed.error.errors);
-    return;
+    throw new Error(`Dados inválidos ao salvar reserva — ${formatZodError(parsed.error)}`);
   }
 
   const d = parsed.data;

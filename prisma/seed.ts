@@ -7,12 +7,20 @@ const prisma = new PrismaClient();
 // Os usuários abaixo são criados com senha temporária "trocar123" — TODOS devem trocar no primeiro login (a gente implementa isso depois).
 const DEFAULT_PASSWORD = "trocar123";
 
-const USERS = [
-  { username: "murilo",  name: "Murilo",  color: "ep", role: "admin" },
-  { username: "joana",   name: "Joana",   color: "mk", role: "admin" },
-  { username: "gabi",    name: "Gabi",    color: "ds", role: "member" },
-  { username: "gustavo", name: "Gustavo", color: "us", role: "member" },
-  { username: "gabriel", name: "Gabriel", color: "ink", role: "member" },
+const ADULTS = [
+  { username: "murilo",  name: "Murilo",  color: "ep",  role: "admin",  birthday: "1996-03-01" },
+  { username: "joana",   name: "Joana",   color: "mk",  role: "admin",  birthday: "1997-01-11" },
+  { username: "gabi",    name: "Gabi",    color: "ds",  role: "member", birthday: "1990-11-19" },
+  { username: "gustavo", name: "Gustavo", color: "us",  role: "member", birthday: "1994-08-16" },
+  { username: "gabriel", name: "Gabriel", color: "ink", role: "member", birthday: "2008-05-09" },
+];
+
+// Crianças: entram como User pra reusar a infra (cor, futuras Interest, etc),
+// mas não logam (passwordHash vazio é bloqueado em verifyCredentials).
+const CHILDREN = [
+  { username: "bernardo", name: "Bernardo", color: "hs",   birthday: "2025-05-10" as string | null },
+  { username: "olivia",   name: "Olívia",   color: "ak",   birthday: "2022-07-16" as string | null },
+  { username: "lucas",    name: "Lucas",    color: "epic", birthday: "2021-07-14" as string | null },
 ];
 
 const TRIP = {
@@ -315,16 +323,37 @@ function utcDT(date: string, time: string) {
 async function main() {
   console.log("🌟 Seeding Orlando 2027…");
 
-  // users
+  // users (adultos)
   const hash = await bcrypt.hash(DEFAULT_PASSWORD, 10);
-  for (const u of USERS) {
+  for (const u of ADULTS) {
+    const birthday = u.birthday ? utc(u.birthday) : null;
     await prisma.user.upsert({
       where: { username: u.username },
-      update: { name: u.name, color: u.color, role: u.role },
-      create: { username: u.username, name: u.name, color: u.color, role: u.role, passwordHash: hash },
+      update: { name: u.name, color: u.color, role: u.role, kind: "adult", birthday },
+      create: { username: u.username, name: u.name, color: u.color, role: u.role, passwordHash: hash, kind: "adult", birthday },
     });
   }
-  console.log(`  ✓ ${USERS.length} usuários (senha temporária: "${DEFAULT_PASSWORD}")`);
+  console.log(`  ✓ ${ADULTS.length} adultos (senha temporária: "${DEFAULT_PASSWORD}")`);
+
+  // crianças (sem login)
+  for (const c of CHILDREN) {
+    const birthday = c.birthday ? utc(c.birthday) : null;
+    await prisma.user.upsert({
+      where: { username: c.username },
+      update: { name: c.name, color: c.color, kind: "child", needsTravelAuth: true, birthday },
+      create: {
+        username: c.username,
+        name: c.name,
+        color: c.color,
+        role: "member",
+        passwordHash: "",
+        kind: "child",
+        needsTravelAuth: true,
+        birthday,
+      },
+    });
+  }
+  console.log(`  ✓ ${CHILDREN.length} crianças (sem login)`);
 
   // trip
   await prisma.trip.upsert({

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { EVENT_CATEGORIES } from "@/lib/parks";
@@ -29,9 +30,14 @@ export default async function EventosPage() {
 
   return (
     <main className="space-y-5 animate-fadeIn">
-      <div className="pt-2">
-        <h1 className="font-display text-3xl font-medium text-ink-900">Eventos e prazos</h1>
-        <p className="text-sm text-ink-600 mt-1">Marcos importantes da preparação</p>
+      <div className="flex items-end justify-between gap-3 pt-2 flex-wrap">
+        <div>
+          <h1 className="font-display text-3xl font-medium text-ink-900">Eventos e prazos</h1>
+          <p className="text-sm text-ink-600 mt-1">Marcos importantes da preparação</p>
+        </div>
+        <Link href="/eventos/timeline" className="text-sm text-ep-600 hover:text-ep-900">
+          ver linha do tempo →
+        </Link>
       </div>
 
       <section className="bg-white border border-ink-100 rounded-2xl p-5">

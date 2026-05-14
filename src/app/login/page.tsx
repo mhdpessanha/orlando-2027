@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, safeRedirectPath } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -9,7 +9,7 @@ export default async function LoginPage({
   searchParams: Promise<{ from?: string; error?: string }>;
 }) {
   const sp = await searchParams;
-  const from = sp.from ?? "/";
+  const from = safeRedirectPath(sp.from);
   const error = sp.error;
 
   const user = await getCurrentUser();

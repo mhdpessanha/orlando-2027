@@ -5,7 +5,6 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: "file:/app/data/orlando.db"
-      SESSION_SECRET: "${SESSION_SECRET}"
       NODE_ENV: production
     ports:
       - "3000:3000"

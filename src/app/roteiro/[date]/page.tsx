@@ -26,6 +26,43 @@ export default async function DayPage({ params }: { params: Promise<{ date: stri
 
   const accs = await prisma.accommodation.findMany({ orderBy: { checkIn: "asc" } });
 
+  // Interesses da turma cujo parque bate com o desse dia.
+  const dayInterests = day.parkCode && day.parkCode !== "off" && day.parkCode !== "travel"
+    ? await prisma.interest.findMany({
+        where: { parkCode: day.parkCode },
+        include: { user: { select: { name: true, color: true } } },
+        orderBy: [{ priority: "desc" }, { name: "asc" }],
+      })
+    : [];
+
+  // Agrupa por (kind + nome lowercase) — mesma atração escrita por gente diferente vira uma linha só.
+  const groupedInterests = new Map<string, {
+    kind: string;
+    name: string;
+    maxPriority: number;
+    voters: { name: string; color: string; priority: number }[];
+  }>();
+  for (const it of dayInterests) {
+    const key = `${it.kind}::${it.name.trim().toLowerCase()}`;
+    const existing = groupedInterests.get(key);
+    if (existing) {
+      existing.voters.push({ name: it.user.name, color: it.user.color, priority: it.priority });
+      existing.maxPriority = Math.max(existing.maxPriority, it.priority);
+    } else {
+      groupedInterests.set(key, {
+        kind: it.kind,
+        name: it.name,
+        maxPriority: it.priority,
+        voters: [{ name: it.user.name, color: it.user.color, priority: it.priority }],
+      });
+    }
+  }
+  const interestGroups = Array.from(groupedInterests.values()).sort(
+    (a, b) => b.maxPriority - a.maxPriority || b.voters.length - a.voters.length,
+  );
+  const attractionGroups = interestGroups.filter((g) => g.kind === "attraction");
+  const diningGroups = interestGroups.filter((g) => g.kind === "dining");
+
   // adjacent days for navigation
   const [prev, next] = await Promise.all([
     prisma.day.findFirst({ where: { date: { lt: day.date } }, orderBy: { date: "desc" } }),
@@ -104,6 +141,23 @@ export default async function DayPage({ params }: { params: Promise<{ date: stri
           </div>
         )}
       </section>
+
+      {/* interests of the group for this park */}
+      {dayInterests.length > 0 && (
+        <section className="bg-white border border-ink-100 rounded-2xl p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-display text-xl font-medium text-ink-900">Interesses da turma</h2>
+            <span className="text-xs text-ink-600">{dayInterests.length} no total · {interestGroups.length} únicos</span>
+          </div>
+
+          {attractionGroups.length > 0 && (
+            <InterestGroupList title="🎢 Atrações" groups={attractionGroups} />
+          )}
+          {diningGroups.length > 0 && (
+            <InterestGroupList title="🍴 Restaurantes" groups={diningGroups} />
+          )}
+        </section>
+      )}
 
       {/* tips / attractions */}
       <section className="bg-white border border-ink-100 rounded-2xl p-5">
@@ -230,4 +284,35 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function iconForTip(cat: string) {
   return ({ attraction: "🎢", dining: "🍴", show: "🎭", tip: "💡", todo: "📝" } as Record<string, string>)[cat] ?? "📌";
+}
+
+function InterestGroupList({
+  title,
+  groups,
+}: {
+  title: string;
+  groups: { name: string; maxPriority: number; voters: { name: string; color: string; priority: number }[] }[];
+}) {
+  return (
+    <div className="mb-4 last:mb-0">
+      <h3 className="text-sm font-medium text-ink-900 mb-2">{title}</h3>
+      <ul className="space-y-1.5">
+        {groups.map((g) => (
+          <li key={g.name} className="flex items-start gap-2 p-2 rounded-lg hover:bg-ink-50 transition">
+            <span className="text-xs whitespace-nowrap">{"⭐".repeat(g.maxPriority)}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-ink-900">{g.name}</p>
+              <p className="text-xs text-ink-600 mt-0.5">
+                {g.voters.length} pessoa{g.voters.length === 1 ? "" : "s"}:{" "}
+                {g.voters
+                  .sort((a, b) => b.priority - a.priority)
+                  .map((v) => `${v.name} ${"★".repeat(v.priority)}`)
+                  .join(" · ")}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }

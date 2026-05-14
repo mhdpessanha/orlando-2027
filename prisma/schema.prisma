@@ -8,14 +8,36 @@ datasource db {
 }
 
 model User {
-  id           String    @id @default(cuid())
-  username     String    @unique
-  name         String
-  passwordHash String
-  color        String    @default("ink")
-  role         String    @default("member")
-  createdAt    DateTime  @default(now())
-  sessions     Session[]
+  id              String    @id @default(cuid())
+  username        String    @unique
+  name            String
+  passwordHash    String
+  color           String    @default("ink")
+  role            String    @default("member")
+  birthday        DateTime?
+  kind            String    @default("adult")
+  needsTravelAuth Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  sessions        Session[]
+  interests       Interest[] @relation("InterestOwner")
+  interestsAdded  Interest[] @relation("InterestAuthor")
+}
+
+model Interest {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("InterestOwner", fields: [userId], references: [id], onDelete: Cascade)
+  kind      String
+  name      String
+  parkCode  String
+  priority  Int      @default(2)
+  notes     String?
+  createdById String?
+  createdBy   User?  @relation("InterestAuthor", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([parkCode])
 }
 
 model Session {
