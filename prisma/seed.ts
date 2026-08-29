@@ -141,11 +141,15 @@ const TIPS: { date: string; category: string; title: string; priority?: number; 
   { date: "2027-01-10", category: "tip", title: "Mudança Polynesian via monorail ou barco no final da tarde", priority: 2 },
   { date: "2027-01-10", category: "dining", title: "Jantar no hotel Polynesian", priority: 1 },
 
-  // 11/01 - EPCOT + ANIVERSÁRIO JOANA
-  { date: "2027-01-11", category: "tip", title: "🎂 Aniversário da Joana!", priority: 3 },
-  { date: "2027-01-11", category: "dining", title: "Café 'Ohana (com Lilo e Stitch)", priority: 3 },
-  { date: "2027-01-11", category: "tip", title: "EPCOT passeio leve · vamos pelo monorail", priority: 2 },
-  { date: "2027-01-11", category: "dining", title: "Jantar Tutto Italia (ou outro no World Showcase)", priority: 3 },
+  // 11/01 - EPCOT + ANIVERSÁRIO 30 ANOS DA JOANA
+  { date: "2027-01-11", category: "tip", title: "🎂 30 anos da Joana — único aniversário da viagem", priority: 3 },
+  { date: "2027-01-11", category: "tip", title: "Sequência do dia: 'Ohana (manhã) → EPCOT monorail → tarde no World Showcase (passar na França pro éclair com vela) → jantar San Angel Inn com bolo → voltar antes do Luminous (Olívia + medo de fogos)", priority: 3, notes: "Plano alinhado com Murilo. Sem fogos." },
+  { date: "2027-01-11", category: "dining", title: "Café 'Ohana — pedir celebration setup na mesa + Lilo & Stitch cantam parabéns (avisar a hostess)", priority: 3 },
+  { date: "2027-01-11", category: "tip", title: "Disney Floral entrega no quarto entre 14h-17h (combinar horário) — ela acha de noite ao voltar", priority: 3 },
+  { date: "2027-01-11", category: "tip", title: "Pic profissional da família com Spaceship Earth — Capture Your Moment ($85, 20min) ou PhotoPass via Memory Maker", priority: 2 },
+  { date: "2027-01-11", category: "dining", title: "Almoço/lanche tarde: França — Les Halles Boulangerie (éclair/macaron com vela)", priority: 2 },
+  { date: "2027-01-11", category: "dining", title: "Jantar San Angel Inn (México) — celebração 30 anos · cenário noite mexicana à beira do rio · cardápio flexível pra Gabi (sem carne)", priority: 3, notes: "Trocou de Tutto Italia. Pedir bolo de aniversário Disney Dining ($45)." },
+  { date: "2027-01-11", category: "tip", title: "Sair do EPCOT antes do show Luminous (~20h30) — evitar fogos pela Olívia", priority: 2 },
 
   // 12/01 - EPCOT
   { date: "2027-01-12", category: "dining", title: "Café no hotel Polynesian", priority: 1 },
@@ -180,11 +184,11 @@ const TIPS: { date: string; category: string; title: string; priority?: number; 
   { date: "2027-01-14", category: "attraction", title: "Rise of the Resistance", priority: 3, notes: "Adultos · Galaxy's Edge · Lightning Lane essencial" },
   { date: "2027-01-14", category: "dining", title: "Jantar Roundup Rodeo BBQ — Quarto do Andy (sem personagens)", priority: 2 },
 
-  // 15/01 - Dia livre Disney
-  { date: "2027-01-15", category: "tip", title: "Dia livre Disney · ingresso sobrando, sem obrigação de usar", priority: 2 },
-  { date: "2027-01-15", category: "tip", title: "Decidir conforme energia e clima das crianças", priority: 2 },
-  { date: "2027-01-15", category: "dining", title: "Ideia: Crystal Palace (Magic Kingdom, com Pooh & amigos)", priority: 1 },
-  { date: "2027-01-15", category: "dining", title: "Ideia: Grand Floridian Cafe (hotel ao lado, leve e bem falado)", priority: 1 },
+  // 15/01 - Dia livre Disney + plano "só Murilo & Joana" no Grand Floridian
+  { date: "2027-01-15", category: "tip", title: "🌹 Dia só Murilo & Joana no Grand Floridian — extensão do aniversário · crianças com Gabi/Gustavo/Gabriel", priority: 3, notes: "Polynesian → Grand Floridian: 1 estação de monorail ou caminhada." },
+  { date: "2027-01-15", category: "tip", title: "Sequência: Senses Spa (massagem ~$170, 50min) → Garden View Tea Room (chá da tarde, ~$50/pessoa) → Floridian Café (jantar, saladas que ela ama)", priority: 3 },
+  { date: "2027-01-15", category: "tip", title: "Resto do grupo: dia livre Disney · ingresso sobrando, decidir conforme energia das crianças", priority: 2 },
+  { date: "2027-01-15", category: "dining", title: "Opção família (sem os pais): Crystal Palace (MK, com Pooh & amigos)", priority: 1 },
 
   // 16/01 - Mudança Vista Cay
   { date: "2027-01-16", category: "todo", title: "Café leve e despedida do Polynesian", priority: 2 },
@@ -299,7 +303,6 @@ const RESERVATIONS = [
 // Eventos / marcos de preparação
 const EVENTS = [
   { title: "Conferir validade dos passaportes",     date: utc("2026-06-01"), category: "document",  description: "Bernardo, Olívia e Lucas precisam ter no mínimo 6 meses de validade", status: "pending" },
-  { title: "ESTA pra todos",                         date: utc("2026-10-08"), category: "document",  description: "ESTA dura 2 anos · solicitar de novo se estiver vencendo", status: "pending" },
   { title: "Abertura de ADRs (60 dias do check-in)", date: utc("2026-11-09"), category: "booking",   description: "Janela pra reservar restaurantes pros primeiros 10 dias da viagem", status: "pending" },
   { title: "Comprar ingressos dos parques",          date: utc("2026-09-01"), category: "shopping",  description: "Disney 7 Day + Universal 3 Parks Adventure", status: "done" },
   { title: "Modificar / confirmar reservas DVC",     date: utc("2026-07-01"), category: "booking",   description: "Kidani 8-10 jan, Polynesian 10-16 jan", status: "done" },
@@ -307,6 +310,15 @@ const EVENTS = [
   { title: "Comprar seguro viagem",                  date: utc("2026-12-01"), category: "shopping",  description: "Todos os 8 viajantes", status: "pending" },
   { title: "Reservar carro alugado (Alamo)",         date: utc("2026-10-01"), category: "shopping",  description: "2 carros: Expedition/Wagoneer + Nissan Rogue · Disney Car Care Center → MCO", status: "done" },
   { title: "Autorização de viagem dos menores",      date: utc("2026-11-01"), category: "document",  description: "Olívia, Bernardo, Lucas · cartório · vale 2 anos", status: "pending" },
+
+  // 🎂 Marcos do aniversário de 30 da Joana — todos prontos pra abertura ADR (09/nov)
+  { title: "🎂 ADR San Angel Inn — jantar 11/jan (aniversário Joana)", date: utc("2026-11-09"), category: "booking", description: "EPCOT · México · trocou de Tutto Italia. Marcar 19h-19h30 pra sair antes do Luminous.", status: "pending" },
+  { title: "🎂 Encomendar bolo de aniversário (jantar 11/jan)",       date: utc("2026-11-09"), category: "booking", description: "Disney Dining ($45) · pedir junto da ADR do San Angel Inn ou via Disney Dining (407-WDW-DINE).", status: "pending" },
+  { title: "🌹 ADR Senses Spa Grand Floridian — dia 15 (Murilo & Joana)", date: utc("2026-11-09"), category: "booking", description: "Massagem ~$170 (50min). Reservar via 407-WDW-SPAS. Idealmente meio da manhã/início da tarde.", status: "pending" },
+  { title: "🌹 ADR Garden View Tea Room — dia 15 (Murilo & Joana)",  date: utc("2026-11-09"), category: "booking", description: "Chá da tarde no lobby do Grand Floridian (~$50/pessoa, ~1h). Encaixar entre o spa e o jantar.", status: "pending" },
+  { title: "🌹 ADR Floridian Café — jantar 15/jan (Murilo & Joana)",  date: utc("2026-11-09"), category: "booking", description: "Saladas pra Joana. Mais casual que fine-dining (sem culpa de preço).", status: "pending" },
+  { title: "🎂 Encomendar Disney Floral pro quarto Polynesian",      date: utc("2027-01-04"), category: "shopping", description: "Balões + flores + bilhete · entrega no quarto entre 14h-17h do dia 11/jan (estamos no EPCOT). Disney Floral & Gifts.", status: "pending" },
+  { title: "📸 Comprar Memory Maker (PhotoPass ilimitado)",          date: utc("2027-01-04"), category: "shopping", description: "$199 antecipado vs $249 in-park. Inclui as fotos do Capture Your Moment se contratar.", status: "pending" },
 ];
 
 function utc(s: string) {

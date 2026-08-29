@@ -11,6 +11,7 @@ const links = [
   { href: "/hospedagens", label: "Hospedagens", icon: "🏨" },
   { href: "/eventos", label: "Eventos", icon: "🔔" },
   { href: "/turma", label: "Turma", icon: "👨‍👩‍👧‍👦" },
+  { href: "/financeiro", label: "Financeiro", icon: "💰" },
 ];
 
 export default function Nav({ userName }: { userName: string }) {
